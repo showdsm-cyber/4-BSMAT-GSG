@@ -1,0 +1,41 @@
+{
+    "productName": "4-BSMAT-GSG",
+    "version": "0.0.0",
+    "identifier": "com.bsmat.gsg",
+    "build": {
+        "beforeDevCommand": "npm run dev",
+        "beforeBuildCommand": "npm run build",
+        "devUrl": "http://localhost:3000",
+        "frontendDist": "../dist"
+    },
+    "app": {
+        "windows": [
+            {
+                "title": "4-BSMAT-GSG",
+                "width": 1280,
+                "height": 800
+            }
+        ],
+        "security": {
+            "csp": null
+        }
+    },
+    "bundle": {
+        "active": true,
+        "targets": "all",
+        "icon": [
+            "icons/32x32.png",
+            "icons/128x128.png",
+            "icons/128x128@2x.png",
+            "icons/icon.icns",
+            "icons/icon.ico"
+        ]
+    },
+    "plugins": {
+        "sql": {
+            "preload": [
+                "sqlite:bsmat.db"
+            ]
+        }
+    }
+}

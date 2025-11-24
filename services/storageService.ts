@@ -1,200 +1,230 @@
-
 import { Soldier, Exception, ServiceProfile, DailySchedule, GuardPoint, Specialty, RankDefinition, RoleDefinition, ScheduleStatus, User } from '../types';
 import { MOCK_SOLDIERS, INITIAL_PROFILES, DEFAULT_GUARD_POINTS, DEFAULT_SPECIALTIES, DEFAULT_RANKS, DEFAULT_ROLES_CONFIG, DEFAULT_USERS } from '../constants';
+import * as db from './db';
 
 const KEYS = {
-  PERSONNEL: 'sm_personnel',
-  EXCEPTIONS: 'sm_exceptions',
-  PROFILES: 'sm_profiles',
-  SCHEDULES: 'sm_schedules',
-  HOLIDAYS: 'sm_holidays', // List of date strings YYYY-MM-DD
-  GUARD_POINTS: 'sm_guard_points',
-  SPECIALTIES: 'sm_specialties',
-  RANKS: 'sm_ranks',
-  ROLES: 'sm_roles',
-  USERS: 'sm_users'
+  PERSONNEL: 'personnel',
+  EXCEPTIONS: 'exceptions',
+  PROFILES: 'profiles',
+  SCHEDULES: 'schedules',
+  HOLIDAYS: 'holidays',
+  GUARD_POINTS: 'guard_points',
+  SPECIALTIES: 'specialties',
+  RANKS: 'ranks',
+  ROLES: 'roles',
+  USERS: 'users'
+};
+
+// In-memory cache
+const cache = {
+  personnel: [] as Soldier[],
+  exceptions: [] as Exception[],
+  profiles: [] as ServiceProfile[],
+  guardPoints: [] as GuardPoint[],
+  specialties: [] as Specialty[],
+  ranks: [] as RankDefinition[],
+  roles: [] as RoleDefinition[],
+  users: [] as User[],
+  holidays: [] as string[],
+  schedules: {} as Record<string, DailySchedule>,
+  initialized: false
+};
+
+export const initializeStorage = async () => {
+  if (cache.initialized) return;
+
+  try {
+    await db.initDB();
+
+    // Load Settings / Blobs
+    cache.personnel = await db.getSetting(KEYS.PERSONNEL) || MOCK_SOLDIERS;
+    cache.exceptions = await db.getSetting(KEYS.EXCEPTIONS) || [];
+    cache.profiles = await db.getSetting(KEYS.PROFILES) || INITIAL_PROFILES;
+    cache.guardPoints = await db.getSetting(KEYS.GUARD_POINTS) || DEFAULT_GUARD_POINTS;
+    cache.specialties = await db.getSetting(KEYS.SPECIALTIES) || DEFAULT_SPECIALTIES;
+    cache.ranks = await db.getSetting(KEYS.RANKS) || DEFAULT_RANKS;
+    cache.roles = await db.getSetting(KEYS.ROLES) || DEFAULT_ROLES_CONFIG;
+    cache.users = await db.getSetting(KEYS.USERS) || DEFAULT_USERS;
+    cache.holidays = await db.getSetting(KEYS.HOLIDAYS) || [];
+
+    // Load Schedules (Separate Table)
+    const schedulesList = await db.getAllItems('schedules');
+    cache.schedules = schedulesList.reduce((acc, s) => ({ ...acc, [s.date]: s }), {});
+
+    cache.initialized = true;
+    console.log("Storage initialized from SQLite");
+  } catch (e) {
+    console.error("Failed to initialize storage from SQLite", e);
+    // Fallback or empty?
+    // If DB fails, we might be in a browser environment or broken state.
+    // For now, we proceed with defaults in cache.
+  }
 };
 
 // --- Users ---
 export const getUsers = (): User[] => {
-  const data = localStorage.getItem(KEYS.USERS);
-  if (!data) {
-    localStorage.setItem(KEYS.USERS, JSON.stringify(DEFAULT_USERS));
-    return DEFAULT_USERS;
-  }
-  return JSON.parse(data);
+  return cache.users;
 };
 
-export const saveUsers = (users: User[]) => {
-  localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+export const saveUsers = async (users: User[]) => {
+  cache.users = users;
+  await db.saveSetting(KEYS.USERS, users);
 };
 
 // --- Personnel ---
 export const getPersonnel = (): Soldier[] => {
-  const data = localStorage.getItem(KEYS.PERSONNEL);
-  if (!data) {
-    localStorage.setItem(KEYS.PERSONNEL, JSON.stringify(MOCK_SOLDIERS));
-    return MOCK_SOLDIERS;
-  }
-  return JSON.parse(data);
+  return cache.personnel;
 };
 
-export const savePersonnel = (personnel: Soldier[]) => {
-  localStorage.setItem(KEYS.PERSONNEL, JSON.stringify(personnel));
+export const savePersonnel = async (personnel: Soldier[]) => {
+  cache.personnel = personnel;
+  await db.saveSetting(KEYS.PERSONNEL, personnel);
 };
 
 // --- Exceptions ---
 export const getExceptions = (): Exception[] => {
-  const data = localStorage.getItem(KEYS.EXCEPTIONS);
-  return data ? JSON.parse(data) : [];
+  return cache.exceptions;
 };
 
-export const saveExceptions = (exceptions: Exception[]) => {
-  localStorage.setItem(KEYS.EXCEPTIONS, JSON.stringify(exceptions));
+export const saveExceptions = async (exceptions: Exception[]) => {
+  cache.exceptions = exceptions;
+  await db.saveSetting(KEYS.EXCEPTIONS, exceptions);
 };
 
 // --- Profiles ---
 export const getProfiles = (): ServiceProfile[] => {
-  const data = localStorage.getItem(KEYS.PROFILES);
-  if (!data) {
-    localStorage.setItem(KEYS.PROFILES, JSON.stringify(INITIAL_PROFILES));
-    return INITIAL_PROFILES;
-  }
-  return JSON.parse(data);
+  return cache.profiles;
 };
 
-export const saveProfiles = (profiles: ServiceProfile[]) => {
-  localStorage.setItem(KEYS.PROFILES, JSON.stringify(profiles));
+export const saveProfiles = async (profiles: ServiceProfile[]) => {
+  cache.profiles = profiles;
+  await db.saveSetting(KEYS.PROFILES, profiles);
 };
 
 // --- Guard Points ---
 export const getGuardPoints = (): GuardPoint[] => {
-  const data = localStorage.getItem(KEYS.GUARD_POINTS);
-  if (!data) {
-    localStorage.setItem(KEYS.GUARD_POINTS, JSON.stringify(DEFAULT_GUARD_POINTS));
-    return DEFAULT_GUARD_POINTS;
-  }
-  return JSON.parse(data);
+  return cache.guardPoints;
 };
 
-export const saveGuardPoints = (points: GuardPoint[]) => {
-  localStorage.setItem(KEYS.GUARD_POINTS, JSON.stringify(points));
+export const saveGuardPoints = async (points: GuardPoint[]) => {
+  cache.guardPoints = points;
+  await db.saveSetting(KEYS.GUARD_POINTS, points);
 };
 
 // --- Specialties ---
 export const getSpecialties = (): Specialty[] => {
-  const data = localStorage.getItem(KEYS.SPECIALTIES);
-  if (!data) {
-    localStorage.setItem(KEYS.SPECIALTIES, JSON.stringify(DEFAULT_SPECIALTIES));
-    return DEFAULT_SPECIALTIES;
-  }
-  return JSON.parse(data);
+  return cache.specialties;
 };
 
-export const saveSpecialties = (specialties: Specialty[]) => {
-  localStorage.setItem(KEYS.SPECIALTIES, JSON.stringify(specialties));
+export const saveSpecialties = async (specialties: Specialty[]) => {
+  cache.specialties = specialties;
+  await db.saveSetting(KEYS.SPECIALTIES, specialties);
 };
 
 // --- Ranks ---
 export const getRanks = (): RankDefinition[] => {
-  const data = localStorage.getItem(KEYS.RANKS);
-  if (!data) {
-    localStorage.setItem(KEYS.RANKS, JSON.stringify(DEFAULT_RANKS));
-    return DEFAULT_RANKS;
-  }
-  return JSON.parse(data).sort((a: RankDefinition, b: RankDefinition) => a.order - b.order);
+  return cache.ranks.sort((a, b) => a.order - b.order);
 };
 
-export const saveRanks = (ranks: RankDefinition[]) => {
-  localStorage.setItem(KEYS.RANKS, JSON.stringify(ranks));
+export const saveRanks = async (ranks: RankDefinition[]) => {
+  cache.ranks = ranks;
+  await db.saveSetting(KEYS.RANKS, ranks);
 };
 
 // --- Roles ---
 export const getRoles = (): RoleDefinition[] => {
-  const data = localStorage.getItem(KEYS.ROLES);
-  if (!data) {
-    localStorage.setItem(KEYS.ROLES, JSON.stringify(DEFAULT_ROLES_CONFIG));
-    return DEFAULT_ROLES_CONFIG;
-  }
-  return JSON.parse(data);
+  return cache.roles;
 };
 
-export const saveRoles = (roles: RoleDefinition[]) => {
-  localStorage.setItem(KEYS.ROLES, JSON.stringify(roles));
+export const saveRoles = async (roles: RoleDefinition[]) => {
+  cache.roles = roles;
+  await db.saveSetting(KEYS.ROLES, roles);
 };
 
 // --- Schedules ---
 export const getSchedule = (date: string): DailySchedule | null => {
-  const all = JSON.parse(localStorage.getItem(KEYS.SCHEDULES) || '{}');
-  const schedule = all[date] || null;
-  // Backward compatibility: If status missing, assume DRAFT
+  const schedule = cache.schedules[date] || null;
   if (schedule && !schedule.status) {
-      schedule.status = 'DRAFT';
+    schedule.status = 'DRAFT';
   }
   return schedule;
 };
 
 export const getAllSchedules = (): Record<string, DailySchedule> => {
-  return JSON.parse(localStorage.getItem(KEYS.SCHEDULES) || '{}');
+  return cache.schedules;
 };
 
-export const saveSchedule = (schedule: DailySchedule) => {
-  const all = JSON.parse(localStorage.getItem(KEYS.SCHEDULES) || '{}');
-  all[schedule.date] = schedule;
-  localStorage.setItem(KEYS.SCHEDULES, JSON.stringify(all));
+export const saveSchedule = async (schedule: DailySchedule) => {
+  cache.schedules[schedule.date] = schedule;
+  await db.saveItem('schedules', schedule.date, schedule);
 };
 
-export const setScheduleStatus = (date: string, status: ScheduleStatus) => {
-    const all = JSON.parse(localStorage.getItem(KEYS.SCHEDULES) || '{}');
-    if (all[date]) {
-        all[date].status = status;
-        localStorage.setItem(KEYS.SCHEDULES, JSON.stringify(all));
-    }
+export const setScheduleStatus = async (date: string, status: ScheduleStatus) => {
+  if (cache.schedules[date]) {
+    cache.schedules[date].status = status;
+    await db.saveItem('schedules', date, cache.schedules[date]);
+  }
 };
 
 // --- Holidays ---
 export const getHolidays = (): string[] => {
-  return JSON.parse(localStorage.getItem(KEYS.HOLIDAYS) || '[]');
+  return cache.holidays;
 };
 
-export const toggleHoliday = (date: string) => {
-  let list = getHolidays();
+export const toggleHoliday = async (date: string) => {
+  let list = cache.holidays;
   if (list.includes(date)) {
     list = list.filter(d => d !== date);
   } else {
     list.push(date);
   }
-  localStorage.setItem(KEYS.HOLIDAYS, JSON.stringify(list));
+  cache.holidays = list;
+  await db.saveSetting(KEYS.HOLIDAYS, list);
   return list;
 };
 
 // --- Backup & Restore ---
 export const createBackup = (): string => {
-  const backup: Record<string, any> = {};
-  Object.values(KEYS).forEach(key => {
-    const data = localStorage.getItem(key);
-    if (data) {
-      try {
-        backup[key] = JSON.parse(data);
-      } catch (e) {
-        console.warn(`Failed to parse key ${key} for backup`, e);
-      }
-    }
-  });
+  const backup: Record<string, any> = {
+    [KEYS.PERSONNEL]: cache.personnel,
+    [KEYS.EXCEPTIONS]: cache.exceptions,
+    [KEYS.PROFILES]: cache.profiles,
+    [KEYS.GUARD_POINTS]: cache.guardPoints,
+    [KEYS.SPECIALTIES]: cache.specialties,
+    [KEYS.RANKS]: cache.ranks,
+    [KEYS.ROLES]: cache.roles,
+    [KEYS.USERS]: cache.users,
+    [KEYS.HOLIDAYS]: cache.holidays,
+    [KEYS.SCHEDULES]: cache.schedules
+  };
   return JSON.stringify(backup, null, 2);
 };
 
-export const restoreBackup = (jsonString: string): boolean => {
+export const restoreBackup = async (jsonString: string): Promise<boolean> => {
   try {
     const backup = JSON.parse(jsonString);
     if (!backup || typeof backup !== 'object') return false;
 
-    // Iterate over known keys to prevent injecting garbage
-    Object.values(KEYS).forEach(key => {
-      if (backup[key]) {
-        localStorage.setItem(key, JSON.stringify(backup[key]));
+    if (backup[KEYS.PERSONNEL]) await savePersonnel(backup[KEYS.PERSONNEL]);
+    if (backup[KEYS.EXCEPTIONS]) await saveExceptions(backup[KEYS.EXCEPTIONS]);
+    if (backup[KEYS.PROFILES]) await saveProfiles(backup[KEYS.PROFILES]);
+    if (backup[KEYS.GUARD_POINTS]) await saveGuardPoints(backup[KEYS.GUARD_POINTS]);
+    if (backup[KEYS.SPECIALTIES]) await saveSpecialties(backup[KEYS.SPECIALTIES]);
+    if (backup[KEYS.RANKS]) await saveRanks(backup[KEYS.RANKS]);
+    if (backup[KEYS.ROLES]) await saveRoles(backup[KEYS.ROLES]);
+    if (backup[KEYS.USERS]) await saveUsers(backup[KEYS.USERS]);
+    if (backup[KEYS.HOLIDAYS]) {
+      cache.holidays = backup[KEYS.HOLIDAYS];
+      await db.saveSetting(KEYS.HOLIDAYS, backup[KEYS.HOLIDAYS]);
+    }
+
+    if (backup[KEYS.SCHEDULES]) {
+      const schedules = backup[KEYS.SCHEDULES];
+      for (const date in schedules) {
+        await saveSchedule(schedules[date]);
       }
-    });
+    }
+
     return true;
   } catch (e) {
     console.error("Failed to restore backup", e);
