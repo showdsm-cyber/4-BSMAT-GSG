@@ -13,7 +13,7 @@ const Layout: React.FC = () => {
     // Check local storage or preference
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
       setIsDark(true);
       document.documentElement.classList.add('dark');
@@ -36,8 +36,8 @@ const Layout: React.FC = () => {
   };
 
   const handleLogout = () => {
-      logout();
-      navigate('/login');
+    logout();
+    navigate('/login');
   };
 
   const navItems = [
@@ -67,10 +67,9 @@ const Layout: React.FC = () => {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex items-center px-4 py-3 rounded-sm transition-all duration-200 group border-l-2 relative overflow-hidden ${
-                  isActive
-                    ? "bg-military-800/60 text-military-accent border-military-accent shadow-md backdrop-blur-sm"
-                    : "border-transparent text-slate-400 hover:bg-military-800/40 hover:text-slate-100 hover:border-military-600/50"
+                `flex items-center px-4 py-3 rounded-sm transition-all duration-200 group border-l-2 relative overflow-hidden ${isActive
+                  ? "bg-military-800/60 text-military-accent border-military-accent shadow-md backdrop-blur-sm"
+                  : "border-transparent text-slate-400 hover:bg-military-800/40 hover:text-slate-100 hover:border-military-600/50"
                 }`
               }
             >
@@ -82,25 +81,29 @@ const Layout: React.FC = () => {
 
         <div className="p-4 border-t border-white/5 space-y-2 bg-military-900/10">
           <div className="px-4 py-2 mb-2 text-xs font-mono text-center text-military-500 uppercase tracking-widest">
-              Connecté en tant que<br/>
-              <span className="text-slate-200 font-bold">{user?.displayName}</span>
+            Connecté en tant que<br />
+            <span className="text-slate-200 font-bold">{user?.displayName}</span>
           </div>
 
-          <button 
+          <button
             onClick={toggleTheme}
             className="flex items-center w-full px-4 py-2 text-sm text-slate-400 hover:text-slate-100 hover:bg-military-800/50 rounded-sm transition-colors uppercase tracking-wider font-bold text-xs"
           >
             {isDark ? <Sun className="w-4 h-4 mr-3" /> : <Moon className="w-4 h-4 mr-3" />}
             Mode {isDark ? 'Clair' : 'Sombre'}
           </button>
-          
-          <button 
+
+          <button
             onClick={handleLogout}
             className="flex items-center w-full px-4 py-2 text-sm text-slate-400 hover:text-red-400 hover:bg-military-800/50 rounded-sm transition-colors uppercase tracking-wider font-bold text-xs"
           >
             <LogOut className="w-4 h-4 mr-3" />
             Déconnexion
           </button>
+
+          <div className="pt-2 text-center">
+            <p className="text-[9px] text-military-600 font-mono opacity-50">v1.2 - Dev: A/C DIHI - FAR@2026</p>
+          </div>
         </div>
       </aside>
 
@@ -112,11 +115,11 @@ const Layout: React.FC = () => {
             4ème Bataillon de Soutien des Matériels
           </h2>
           <div className="flex items-center space-x-3 bg-military-950/30 px-3 py-1 rounded-sm border border-white/5 transition-colors duration-200 backdrop-blur-sm">
-             <div className="h-2 w-2 rounded-full bg-military-accent animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.6)]"></div>
-             <span className="text-[10px] font-mono text-military-500 uppercase tracking-widest">Système Opérationnel</span>
+            <div className="h-2 w-2 rounded-full bg-military-accent animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.6)]"></div>
+            <span className="text-[10px] font-mono text-military-500 uppercase tracking-widest">Système Opérationnel</span>
           </div>
         </header>
-        
+
         <div className="flex-1 overflow-auto p-8 print:p-0 print:overflow-visible">
           <div className="max-w-7xl mx-auto print:max-w-none">
             <Outlet />

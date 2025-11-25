@@ -156,13 +156,13 @@ export const getAllSchedules = (): Record<string, DailySchedule> => {
 
 export const saveSchedule = async (schedule: DailySchedule) => {
   cache.schedules[schedule.date] = schedule;
-  await db.saveItem('schedules', schedule.date, schedule);
+  await db.saveItem('schedules', schedule.date, schedule, 'date');
 };
 
 export const setScheduleStatus = async (date: string, status: ScheduleStatus) => {
   if (cache.schedules[date]) {
     cache.schedules[date].status = status;
-    await db.saveItem('schedules', date, cache.schedules[date]);
+    await db.saveItem('schedules', date, cache.schedules[date], 'date');
   }
 };
 

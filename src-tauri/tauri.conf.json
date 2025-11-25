@@ -1,6 +1,6 @@
 {
     "productName": "4-BSMAT-GSG",
-    "version": "0.0.0",
+    "version": "1.2.0",
     "identifier": "com.bsmat.gsg",
     "build": {
         "beforeDevCommand": "npm run dev",
@@ -13,11 +13,16 @@
             {
                 "title": "4-BSMAT-GSG",
                 "width": 1280,
-                "height": 800
+                "height": 800,
+                "decorations": false,
+                "transparent": true
             }
         ],
         "security": {
-            "csp": null
+            "csp": null,
+            "capabilities": [
+                "app-capability"
+            ]
         }
     },
     "bundle": {

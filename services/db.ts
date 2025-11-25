@@ -21,16 +21,16 @@ export const getDB = async () => {
     return db!;
 };
 
-export const saveItem = async (table: string, id: string, data: any) => {
+export const saveItem = async (table: string, id: string, data: any, pkColumn: string = 'id') => {
     const db = await getDB();
     const json = JSON.stringify(data);
     // Upsert
-    await db.execute(`INSERT INTO ${table} (id, data) VALUES ($1, $2) ON CONFLICT(id) DO UPDATE SET data = $2`, [id, json]);
+    await db.execute(`INSERT INTO ${table} (${pkColumn}, data) VALUES ($1, $2) ON CONFLICT(${pkColumn}) DO UPDATE SET data = $2`, [id, json]);
 };
 
-export const getItem = async (table: string, id: string) => {
+export const getItem = async (table: string, id: string, pkColumn: string = 'id') => {
     const db = await getDB();
-    const result = await db.select<any[]>(`SELECT data FROM ${table} WHERE id = $1`, [id]);
+    const result = await db.select<any[]>(`SELECT data FROM ${table} WHERE ${pkColumn} = $1`, [id]);
     if (result.length > 0) {
         return JSON.parse(result[0].data);
     }
@@ -43,9 +43,9 @@ export const getAllItems = async (table: string) => {
     return result.map(row => JSON.parse(row.data));
 };
 
-export const deleteItem = async (table: string, id: string) => {
+export const deleteItem = async (table: string, id: string, pkColumn: string = 'id') => {
     const db = await getDB();
-    await db.execute(`DELETE FROM ${table} WHERE id = $1`, [id]);
+    await db.execute(`DELETE FROM ${table} WHERE ${pkColumn} = $1`, [id]);
 };
 
 // Settings (Key-Value)

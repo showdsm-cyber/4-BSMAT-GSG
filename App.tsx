@@ -2,6 +2,7 @@
 import React from 'react';
 import { MemoryRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
+import TitleBar from './components/TitleBar';
 import Dashboard from './pages/Dashboard';
 import Planning from './pages/Planning';
 import Personnel from './pages/Personnel';
@@ -114,9 +115,12 @@ function App() {
 
     return (
         <AuthProvider>
-            <Router>
-                <AppRoutes />
-            </Router>
+            <TitleBar />
+            <div className="pt-8 h-screen flex flex-col">
+                <Router>
+                    <AppRoutes />
+                </Router>
+            </div>
         </AuthProvider>
     );
 }

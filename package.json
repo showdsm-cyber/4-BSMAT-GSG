@@ -1,7 +1,7 @@
 {
   "name": "4°bsmat-gsg",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,6 +10,9 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@tauri-apps/api": "^2.9.0",
     "@tauri-apps/plugin-sql": "^2.3.1",
     "date-fns": "2.30.0",
     "lucide-react": "0.292.0",
@@ -21,6 +24,9 @@
     "@tauri-apps/cli": "^2.9.4",
     "@types/node": "^22.19.1",
     "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }
