@@ -1,54 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   /* LIGHT MODE (Mode Administration/Jour) */
-  --bg-950: #f8fafc;
+  --bg-950: #f6f7fb;
   --bg-900: #ffffff;
-  --bg-800: #e2e8f0;
-  --bg-700: #cbd5e1;
-  --bg-600: #94a3b8;
+  --bg-800: #e8edf6;
+  --bg-700: #d3d9e5;
+  --bg-600: #b8c0d3;
 
   --text-100: #0f172a;
   --text-200: #1e293b;
   --text-300: #334155;
   --text-400: #475569;
-  --text-500: #64748b;
+  --text-500: #5b6477;
 
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-input-bg: rgba(255, 255, 255, 0.6);
-  --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-input-bg: rgba(255, 255, 255, 0.65);
+  --glass-shadow: 0 18px 45px -30px rgba(15, 23, 42, 0.55);
 }
 
 .dark {
-  /* DARK MODE (Mode Tactique/Nuit - Zinc Palette) */
-  --bg-950: #09090b;
-  --bg-900: #18181b;
-  --bg-800: #27272a;
-  --bg-700: #3f3f46;
-  --bg-600: #52525b;
+  /* DARK MODE (Mode Tactique/Nuit - Marine) */
+  --bg-950: #050914;
+  --bg-900: #0b1220;
+  --bg-800: #101a2c;
+  --bg-700: #18253a;
+  --bg-600: #213552;
 
-  --text-100: #f4f4f5;
-  --text-200: #e4e4e7;
-  --text-300: #d4d4d8;
-  --text-400: #a1a1aa;
-  --text-500: #71717a;
+  --text-100: #eef2ff;
+  --text-200: #e2e8f0;
+  --text-300: #cdd6e5;
+  --text-400: #94a3b8;
+  --text-500: #7c8aa4;
 
   --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-bg: rgba(24, 24, 27, 0.6);
-  --glass-input-bg: rgba(0, 0, 0, 0.2);
-  --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --glass-bg: rgba(14, 22, 38, 0.8);
+  --glass-input-bg: rgba(255, 255, 255, 0.06);
+  --glass-shadow: 0 24px 80px -50px rgba(0, 0, 0, 0.85);
 }
 
 body {
   background-color: var(--bg-950);
   background-image:
-    radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(234, 179, 8, 0.08) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.08) 0px, transparent 50%);
+    radial-gradient(at 20% 20%, rgba(234, 179, 8, 0.07) 0px, transparent 40%),
+    radial-gradient(at 80% 0%, rgba(14, 165, 233, 0.07) 0px, transparent 35%),
+    radial-gradient(at 50% 90%, rgba(94, 234, 212, 0.05) 0px, transparent 45%);
   background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px, 28px 28px;
+  opacity: 0.35;
+  z-index: 0;
 }
 
 /* Custom Scrollbar */
@@ -102,5 +117,20 @@ body {
 
 .glass-input:focus {
   border-color: #eab308;
-  background-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.12);
+}
+
+@keyframes loaderSlide {
+  0% {
+    transform: translateX(-45%);
+    width: 35%;
+  }
+  50% {
+    transform: translateX(55%);
+    width: 60%;
+  }
+  100% {
+    transform: translateX(-45%);
+    width: 35%;
+  }
 }
